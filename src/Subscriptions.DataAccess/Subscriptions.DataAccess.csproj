@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk"><ItemGroup>
+  <ProjectReference Include="../Subscriptions.Business/Subscriptions.Business.csproj" />
+  <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.33" />
+  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.33" PrivateAssets="all" />
+</ItemGroup></Project>

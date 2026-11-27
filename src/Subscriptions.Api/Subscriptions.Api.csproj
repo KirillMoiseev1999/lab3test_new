@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk.Web"><ItemGroup>
+  <ProjectReference Include="../Subscriptions.Business/Subscriptions.Business.csproj" />
+  <ProjectReference Include="../Subscriptions.DataAccess/Subscriptions.DataAccess.csproj" />
+  <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+</ItemGroup></Project>
