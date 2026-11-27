@@ -47,27 +47,6 @@ namespace Subscriptions.DataAccess.Migrations
                     b.ToTable("IdempotencyRecords");
                 });
 
-            modelBuilder.Entity("Subscriptions.DataAccess.Entities.LoginAttempt", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NormalizedEmail")
-                        .IsRequired()
-                        .HasMaxLength(254)
-                        .HasColumnType("TEXT");
-
-                    b.Property<long>("OccurredAtUtcTicks")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail", "OccurredAtUtcTicks");
-
-                    b.ToTable("LoginAttempts");
-                });
-
             modelBuilder.Entity("Subscriptions.DataAccess.Entities.Payment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -79,11 +58,6 @@ namespace Subscriptions.DataAccess.Migrations
 
                     b.Property<long>("CreatedAtUtcTicks")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("Currency")
-                        .IsRequired()
-                        .HasMaxLength(3)
-                        .HasColumnType("TEXT");
 
                     b.Property<DateOnly>("PaidOn")
                         .HasColumnType("TEXT");
@@ -98,8 +72,6 @@ namespace Subscriptions.DataAccess.Migrations
                     b.ToTable("Payments", t =>
                         {
                             t.HasCheckConstraint("CK_Payment_Amount", "AmountMinor BETWEEN 1 AND 99999999999");
-
-                            t.HasCheckConstraint("CK_Payment_Currency", "Currency IN ('RUB','USD','EUR')");
                         });
                 });
 
@@ -126,16 +98,6 @@ namespace Subscriptions.DataAccess.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Currency")
-                        .IsRequired()
-                        .HasMaxLength(3)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Frequency")
@@ -168,8 +130,6 @@ namespace Subscriptions.DataAccess.Migrations
 
                     b.ToTable("Subscriptions", t =>
                         {
-                            t.HasCheckConstraint("CK_Subscription_Currency", "Currency IN ('RUB','USD','EUR')");
-
                             t.HasCheckConstraint("CK_Subscription_Frequency", "Frequency IN ('monthly','yearly')");
 
                             t.HasCheckConstraint("CK_Subscription_Price", "PriceMinor BETWEEN 1 AND 99999999999");

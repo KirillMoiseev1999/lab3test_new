@@ -24,9 +24,7 @@ public sealed class SubscriptionService(ISubscriptionStore store, IAtomicExecuto
         var data = Validate(id, user, input);
         return atomic.ExecuteAsync(async () =>
         {
-            var previous = await OwnedAsync(user, id, ct);
-            if (previous.Currency != data.Currency && await store.HasPaymentsAsync(id, ct))
-                throw new BusinessException(409, "currency_conflict", "Нельзя менять валюту подписки с платежами.");
+            await OwnedAsync(user, id, ct);
             await store.UpdateAsync(data, ct);
             return Map(data);
         }, ct);
@@ -39,11 +37,11 @@ public sealed class SubscriptionService(ISubscriptionStore store, IAtomicExecuto
             return true;
         }, ct);
     public async Task<PageResponse<SubscriptionResponse>> ListAsync(Guid user, string? status,
-        string? category, string? page, string? size, CancellationToken ct = default)
+        string? page, string? size, CancellationToken ct = default)
     {
         if (status is not null) InputValidator.Choice(status, "status", "active", "paused", "archived");
         var paging = InputValidator.Paging(page, size);
-        var result = await store.ListAsync(user, status, category?.Trim(), paging.Page, paging.Size, ct);
+        var result = await store.ListAsync(user, status, paging.Page, paging.Size, ct);
         return new(result.Items.Select(Map).ToArray(), paging.Page, paging.Size, result.Count);
     }
     public async Task<SubscriptionData> OwnedAsync(Guid user, Guid id, CancellationToken ct) =>
@@ -51,13 +49,11 @@ public sealed class SubscriptionService(ISubscriptionStore store, IAtomicExecuto
             throw new BusinessException(404, "subscription_not_found", "Подписка не найдена.");
     private static SubscriptionData Validate(Guid id, Guid user, SubscriptionInput input) =>
         new(id, user, InputValidator.Required(input.Name, "name", 100),
-            InputValidator.Required(input.Category, "category", 50),
             InputValidator.Money(input.Price, "price"),
-            InputValidator.Choice(input.Currency, "currency", "RUB", "USD", "EUR"),
             InputValidator.Choice(input.Frequency, "frequency", "monthly", "yearly"),
             InputValidator.Date(input.NextPaymentDate, "nextPaymentDate"),
             InputValidator.Choice(input.Status, "status", "active", "paused", "archived"));
     private static SubscriptionResponse Map(SubscriptionData data) =>
-        new(data.Id, data.Name, data.Category, InputValidator.Amount(data.Price), data.Currency,
+        new(data.Id, data.Name, InputValidator.Amount(data.Price),
             data.Frequency, InputValidator.DateText(data.NextPaymentDate), data.Status);
 }

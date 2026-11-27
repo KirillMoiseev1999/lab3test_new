@@ -21,7 +21,6 @@ public sealed class PaymentStore(SubscriptionsDbContext db) : IPaymentStore
             Id = payment.Id,
             SubscriptionId = payment.SubscriptionId,
             AmountMinor = checked((long)(payment.Amount * 100m)),
-            Currency = payment.Currency,
             PaidOn = payment.PaidOn,
             CreatedAtUtcTicks = payment.CreatedAtUtc.UtcTicks
         });
@@ -53,7 +52,7 @@ public sealed class PaymentStore(SubscriptionsDbContext db) : IPaymentStore
         await (from payment in db.Payments.AsNoTracking()
                join subscription in db.Subscriptions on payment.SubscriptionId equals subscription.Id
                where subscription.UserId == userId && payment.PaidOn >= start && payment.PaidOn < end
-               select new ExpenseData(subscription.Category, payment.Currency, payment.AmountMinor / 100m)).ToListAsync(ct);
+               select new ExpenseData(subscription.Id, subscription.Name, payment.AmountMinor / 100m)).ToListAsync(ct);
     private static PaymentData Map(Payment e) =>
-        new(e.Id, e.SubscriptionId, e.AmountMinor / 100m, e.Currency, e.PaidOn, new DateTimeOffset(e.CreatedAtUtcTicks, TimeSpan.Zero));
+        new(e.Id, e.SubscriptionId, e.AmountMinor / 100m, e.PaidOn, new DateTimeOffset(e.CreatedAtUtcTicks, TimeSpan.Zero));
 }

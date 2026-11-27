@@ -1,3 +1,3 @@
 namespace Subscriptions.Business.Contracts;
 
-public sealed record ExpensesResponse(IReadOnlyList<CurrencyTotal> ByCurrency, IReadOnlyList<CategoryTotal> ByCategory);
+public sealed record ExpensesResponse(string Total, IReadOnlyList<SubscriptionExpense> BySubscription);

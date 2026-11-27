@@ -10,12 +10,12 @@ namespace Subscriptions.Api.Controllers;
 public sealed class HealthController(IReadinessProbe probe) : ControllerBase
 {
     [HttpGet("ready"), AllowAnonymous]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(typeof(ReadyResponse), 200)]
     [ProducesResponseType(typeof(ErrorResponse), 503)]
     public async Task<IActionResult> Ready(CancellationToken ct)
     {
         if (!await probe.IsReadyAsync(ct))
             return StatusCode(503, new ErrorResponse("database_unavailable", "База не готова.", HttpContext.TraceIdentifier));
-        return Ok(new { status = "ready" });
+        return Ok(new ReadyResponse("ready"));
     }
 }

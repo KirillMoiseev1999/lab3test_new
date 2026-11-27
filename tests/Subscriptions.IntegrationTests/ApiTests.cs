@@ -22,7 +22,7 @@ public class ApiTests
     private HttpClient client = null!;
     private TestClock clock = null!;
     private const string Password = "Demo-password-2026";
-    private readonly SubscriptionInput input = new("Music", "Media", "100.00", "RUB", "monthly", "2026-12-01", "active");
+    private readonly SubscriptionInput input = new("Music", "100.00", "monthly", "2026-12-01", "active");
 
     [SetUp]
     public void Setup()
@@ -78,7 +78,7 @@ public class ApiTests
         return (await response.Content.ReadFromJsonAsync<SubscriptionResponse>())!;
     }
     private async Task<HttpResponseMessage> Pay(string token, Guid id, string key, string amount = "100.00", string date = "2026-11-27") =>
-        await Send(HttpMethod.Post, $"/subscriptions/{id}/payments", token, new PaymentInput(amount, "RUB", date), key);
+        await Send(HttpMethod.Post, $"/subscriptions/{id}/payments", token, new PaymentInput(amount, date), key);
 
     [Test]
     public async Task ReadyAndOpenApiDescribeOnlyRequiredEndpoints()
@@ -89,6 +89,13 @@ public class ApiTests
         Assert.That(paths.EnumerateObject().Sum(p => p.Value.EnumerateObject().Count()), Is.EqualTo(12));
         Assert.That(paths.TryGetProperty("/api/v1/calendar", out _), Is.False);
         Assert.That(json.RootElement.GetProperty("components").GetProperty("securitySchemes").TryGetProperty("Bearer", out _), Is.True);
+        var schemas = json.RootElement.GetProperty("components").GetProperty("schemas");
+        Assert.That(schemas.GetProperty("SubscriptionInput").GetProperty("properties").EnumerateObject().Select(x => x.Name),
+            Is.EquivalentTo(new[] { "name", "price", "frequency", "nextPaymentDate", "status" }));
+        Assert.That(schemas.GetProperty("PaymentInput").GetProperty("properties").EnumerateObject().Select(x => x.Name),
+            Is.EquivalentTo(new[] { "amount", "paidOn" }));
+        Assert.That(schemas.GetProperty("ExpensesResponse").GetProperty("properties").EnumerateObject().Select(x => x.Name),
+            Is.EquivalentTo(new[] { "total", "bySubscription" }));
     }
     [Test]
     public async Task RegistrationNormalizesEmailAndConcurrentDuplicatesConflict()
@@ -103,17 +110,14 @@ public class ApiTests
         Assert.That((await db.Users.SingleAsync()).PasswordHash, Is.Not.EqualTo(Password));
     }
     [Test]
-    public async Task LoginLimitExpiresAtFifteenMinuteBoundary()
+    public async Task WrongCredentialsDoNotBlockSubsequentCorrectLogin()
     {
         await User();
-        for (var i = 0; i < 5; i++)
+        for (var i = 0; i < 6; i++)
         {
             var bad = await client.PostAsJsonAsync("/api/v1/auth/login", new AuthInput("user@example.com", "wrong-password-2026"));
             Assert.That(bad.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
         }
-        var blocked = await client.PostAsJsonAsync("/api/v1/auth/login", new AuthInput("user@example.com", Password));
-        Assert.That(blocked.StatusCode, Is.EqualTo(HttpStatusCode.TooManyRequests));
-        clock.UtcNow = clock.UtcNow.AddMinutes(15);
         await Login("user@example.com");
     }
     [Test]
@@ -134,8 +138,8 @@ public class ApiTests
         var owner = await User();
         var foreign = await User("other@example.com");
         var first = await Subscription(owner);
-        await Subscription(owner, input with { Name = "Other", Category = "Other", Status = "paused" });
-        var filtered = await Send(HttpMethod.Get, "/subscriptions?category=Media&status=active&pageSize=1", owner);
+        await Subscription(owner, input with { Name = "Other", Status = "paused" });
+        var filtered = await Send(HttpMethod.Get, "/subscriptions?status=active&pageSize=1", owner);
         var list = (await filtered.Content.ReadFromJsonAsync<PageResponse<SubscriptionResponse>>())!;
         Assert.That(list.TotalCount, Is.EqualTo(1));
         Assert.That(list.PageSize, Is.EqualTo(1));
@@ -193,14 +197,13 @@ public class ApiTests
         await Pay(token, sub.Id, "one", "100.00", "2026-11-25");
         await Pay(token, sub.Id, "two", "200.00", "2026-11-26");
         await Pay(token, sub.Id, "end", "400.00", "2026-11-27");
-        var dollar = await Subscription(token, input with { Currency = "USD" });
-        Assert.That((await Send(HttpMethod.Post, $"/subscriptions/{dollar.Id}/payments", token,
-            new PaymentInput("10.00", "USD", "2026-11-25"), "usd")).StatusCode, Is.EqualTo(HttpStatusCode.Created));
-        Assert.That((await Send(HttpMethod.Put, $"/subscriptions/{sub.Id}", token, input with { Currency = "USD" })).StatusCode, Is.EqualTo(HttpStatusCode.Conflict));
+        await Send(HttpMethod.Put, $"/subscriptions/{sub.Id}", token, input with { Name = "Renamed", Price = "500.00" });
         await Send(HttpMethod.Delete, $"/subscriptions/{sub.Id}", token);
         var response = await Send(HttpMethod.Get, "/analytics/expenses?from=2026-11-25&to=2026-11-27", token);
         var totals = (await response.Content.ReadFromJsonAsync<ExpensesResponse>())!;
-        Assert.That(totals.ByCurrency.Select(x => x.Amount), Is.EqualTo(new[] { "300.00", "10.00" }));
+        Assert.That(totals.Total, Is.EqualTo("300.00"));
+        Assert.That(totals.BySubscription.Single().Amount, Is.EqualTo("300.00"));
+        Assert.That(totals.BySubscription.Single().Name, Is.EqualTo("Renamed"));
         var history = await Send(HttpMethod.Get, $"/payments?from=2026-11-25&to=2026-11-27&subscriptionId={sub.Id}&pageSize=1", token);
         var list = (await history.Content.ReadFromJsonAsync<PageResponse<PaymentResponse>>())!;
         Assert.That(list.TotalCount, Is.EqualTo(2));
@@ -215,7 +218,7 @@ public class ApiTests
         Assert.That((await Pay(other, sub.Id, "key")).StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         Assert.That((await Send(HttpMethod.Get, $"/payments?from=2026-11-01&to=2026-12-01&subscriptionId={sub.Id}", other)).StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         var totals = await Send(HttpMethod.Get, "/analytics/expenses?from=2026-11-01&to=2026-12-01", other);
-        Assert.That((await totals.Content.ReadFromJsonAsync<ExpensesResponse>())!.ByCurrency, Is.Empty);
+        Assert.That((await totals.Content.ReadFromJsonAsync<ExpensesResponse>())!.BySubscription, Is.Empty);
     }
     [Test]
     public async Task MalformedAndUnknownFieldsReturnUnifiedValidationErrors()
@@ -244,6 +247,39 @@ public class ApiTests
         var history = await Send(HttpMethod.Get, "/payments?from=2026-11-01&to=2026-12-01", token);
         Assert.That((await history.Content.ReadFromJsonAsync<PageResponse<PaymentResponse>>())!.TotalCount, Is.EqualTo(1));
     }
+    [TestCase("currency")]
+    [TestCase("category")]
+    public async Task RemovedFieldsAreRejectedByHttpValidation(string field)
+    {
+        var token = await User();
+        var body = new Dictionary<string, object>
+        {
+            ["name"] = "Music",
+            ["price"] = "100.00",
+            ["frequency"] = "monthly",
+            ["nextPaymentDate"] = "2026-12-01",
+            ["status"] = "active",
+            [field] = "removed"
+        };
+        Assert.That((await Send(HttpMethod.Post, "/subscriptions", token, body)).StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+    }
+    [Test]
+    public async Task ActualPaymentsDoNotMoveScheduleAndArchivedSubscriptionCanBeRestored()
+    {
+        var token = await User();
+        var sub = await Subscription(token);
+        Assert.That((await Pay(token, sub.Id, "key", "0.01")).StatusCode, Is.EqualTo(HttpStatusCode.Created));
+        var replay = await Pay(token, sub.Id, "key", "0.01");
+        Assert.That(replay.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+        var response = await Send(HttpMethod.Get, $"/subscriptions/{sub.Id}", token);
+        Assert.That((await response.Content.ReadFromJsonAsync<SubscriptionResponse>())!.NextPaymentDate, Is.EqualTo(input.NextPaymentDate));
+        await Send(HttpMethod.Delete, $"/subscriptions/{sub.Id}", token);
+        Assert.That((await Pay(token, sub.Id, "archived", "200.00")).StatusCode, Is.EqualTo(HttpStatusCode.Created));
+        var restored = await Send(HttpMethod.Put, $"/subscriptions/{sub.Id}", token, input with { Status = "active" });
+        Assert.That((await restored.Content.ReadFromJsonAsync<SubscriptionResponse>())!.Status, Is.EqualTo("active"));
+        var expenses = await Send(HttpMethod.Get, "/analytics/expenses?from=2026-11-27&to=2026-11-28", token);
+        Assert.That((await expenses.Content.ReadFromJsonAsync<ExpensesResponse>())!.Total, Is.EqualTo("200.01"));
+    }
     [Test]
     public async Task TransactionRollbackAndForeignKeysPreventPartialWrites()
     {
@@ -262,7 +298,7 @@ public class ApiTests
         {
             var db = scope.ServiceProvider.GetRequiredService<SubscriptionsDbContext>();
             Assert.That(await db.Users.CountAsync(), Is.Zero);
-            db.Payments.Add(new Payment { Id = Guid.NewGuid(), SubscriptionId = Guid.NewGuid(), AmountMinor = 100, Currency = "RUB", PaidOn = new(2026, 11, 27) });
+            db.Payments.Add(new Payment { Id = Guid.NewGuid(), SubscriptionId = Guid.NewGuid(), AmountMinor = 100, PaidOn = new(2026, 11, 27) });
             Assert.ThrowsAsync<DbUpdateException>(async () => await db.SaveChangesAsync());
         }
     }

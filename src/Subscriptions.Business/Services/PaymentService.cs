@@ -14,26 +14,23 @@ public sealed class PaymentService(IPaymentStore store, SubscriptionService subs
     {
         var normalizedKey = InputValidator.Required(key, "Idempotency-Key", 128);
         var amount = InputValidator.Money(input.Amount, "amount");
-        var currency = InputValidator.Choice(input.Currency, "currency", "RUB", "USD", "EUR");
         var paidOn = InputValidator.Date(input.PaidOn, "paidOn");
         if (paidOn > DateOnly.FromDateTime(clock.UtcNow.UtcDateTime))
             throw InputValidator.Invalid("paidOn", "Дата платежа не может быть в будущем.");
         return atomic.ExecuteAsync(async () =>
         {
-            var subscription = await subscriptions.OwnedAsync(user, subscriptionId, ct);
+            await subscriptions.OwnedAsync(user, subscriptionId, ct);
             var previous = await store.FindKeyAsync(user, normalizedKey, ct);
             var now = clock.UtcNow;
             if (previous is not null && previous.CreatedAtUtc.AddHours(24) > now)
             {
                 var payment = previous.Payment;
                 if (payment.SubscriptionId != subscriptionId || payment.Amount != amount ||
-                    payment.Currency != currency || payment.PaidOn != paidOn)
+                    payment.PaidOn != paidOn)
                     throw new BusinessException(409, "idempotency_conflict", "Ключ использован с другими данными.");
                 return Map(payment);
             }
-            if (subscription.Currency != currency)
-                throw InputValidator.Invalid("currency", "Валюта должна совпадать с подпиской.");
-            var data = new PaymentData(Guid.NewGuid(), subscriptionId, amount, currency, paidOn, now);
+            var data = new PaymentData(Guid.NewGuid(), subscriptionId, amount, paidOn, now);
             var record = new IdempotencyData(previous?.Id ?? Guid.NewGuid(), user, normalizedKey, data, now);
             await store.SaveAsync(data, record, ct);
             return Map(data);
@@ -49,6 +46,6 @@ public sealed class PaymentService(IPaymentStore store, SubscriptionService subs
         return new(result.Items.Select(Map).ToArray(), paging.Page, paging.Size, result.Count);
     }
     private static PaymentResponse Map(PaymentData data) =>
-        new(data.Id, data.SubscriptionId, InputValidator.Amount(data.Amount), data.Currency,
+        new(data.Id, data.SubscriptionId, InputValidator.Amount(data.Amount),
             InputValidator.DateText(data.PaidOn));
 }

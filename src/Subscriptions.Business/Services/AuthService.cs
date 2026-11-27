@@ -23,28 +23,20 @@ public sealed class AuthService(IAuthStore store, IAtomicExecutor atomic,
             return new UserResponse(id, email);
         }, ct);
     }
-    public async Task<LoginResponse> LoginAsync(AuthInput input, CancellationToken ct = default)
+    public Task<LoginResponse> LoginAsync(AuthInput input, CancellationToken ct = default)
     {
         var email = InputValidator.Email(input.Email).ToLowerInvariant();
         var password = InputValidator.Password(input.Password);
-        // Commit a failed attempt before returning the authentication error.
-        var result = await atomic.ExecuteAsync<LoginResponse?>(async () =>
+        return atomic.ExecuteAsync(async () =>
         {
-            var now = clock.UtcNow;
-            if (await store.CountFailuresAsync(email, now.AddMinutes(-15), ct) >= 5)
-                throw new BusinessException(429, "too_many_login_attempts", "Повторите вход позже.");
             var user = await store.FindUserAsync(email, ct);
             if (user is null || !passwords.Verify(user.Id, user.PasswordHash, password))
-            {
-                await store.AddFailureAsync(email, now, ct);
-                return null;
-            }
+                throw Unauthorized();
             var token = tokens.Create();
-            var expires = now.AddMinutes(30);
+            var expires = clock.UtcNow.AddMinutes(30);
             await store.AddSessionAsync(new(tokens.Hash(token), user.Id, expires), ct);
             return new LoginResponse(token, "Bearer", expires);
         }, ct);
-        return result ?? throw Unauthorized();
     }
     public async Task<Guid> AuthenticateAsync(string? token, CancellationToken ct = default)
     {

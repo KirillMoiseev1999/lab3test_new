@@ -21,10 +21,10 @@ public abstract class ServiceFixture
     protected Mock<IClock> Clock = null!;
     protected DateTimeOffset Now = new(2026, 11, 27, 12, 0, 0, TimeSpan.Zero);
     protected SubscriptionService SubService = null!;
-    protected SubscriptionData Data => new(Id, User, "Music", "Media", 100m, "RUB", "monthly", new(2026, 12, 1), "active");
-    protected SubscriptionInput Input => new("Music", "Media", "100.00", "RUB", "monthly", "2026-12-01", "active");
-    protected PaymentInput PaymentInput => new("100.00", "RUB", "2026-11-27");
-    protected PaymentData Payment => new(Id, Id, 100m, "RUB", new(2026, 11, 27), Now);
+    protected SubscriptionData Data => new(Id, User, "Music", 100m, "monthly", new(2026, 12, 1), "active");
+    protected SubscriptionInput Input => new("Music", "100.00", "monthly", "2026-12-01", "active");
+    protected PaymentInput PaymentInput => new("100.00", "2026-11-27");
+    protected PaymentData Payment => new(Id, Id, 100m, new(2026, 11, 27), Now);
     protected AuthService AuthService => new(Auth.Object, Atomic.Object, Passwords.Object, Tokens.Object, Clock.Object);
     protected PaymentService PaymentService => new(Payments.Object, SubService, Atomic.Object, Clock.Object);
 
@@ -38,7 +38,7 @@ public abstract class ServiceFixture
         Tokens.Setup(x => x.Create()).Returns(new string('A', 64));
         Tokens.Setup(x => x.Hash(It.IsAny<string>())).Returns("hash");
         Subs.Setup(x => x.FindAsync(User, Id, It.IsAny<CancellationToken>())).ReturnsAsync(() => Data);
-        RunAtomic<UserResponse>(); RunAtomic<LoginResponse?>(); RunAtomic<bool>();
+        RunAtomic<UserResponse>(); RunAtomic<LoginResponse>(); RunAtomic<bool>();
         RunAtomic<SubscriptionResponse>(); RunAtomic<PaymentResponse>();
         SubService = new(Subs.Object, Atomic.Object);
     }

@@ -17,16 +17,6 @@ public sealed class AuthStore(SubscriptionsDbContext db) : IAuthStore
         db.Users.Add(new User { Id = user.Id, Email = user.Email, NormalizedEmail = user.NormalizedEmail, PasswordHash = user.PasswordHash });
         return Task.CompletedTask;
     }
-    public Task<long> CountFailuresAsync(string email, DateTimeOffset cutoff, CancellationToken ct)
-    {
-        var ticks = cutoff.UtcTicks;
-        return db.LoginAttempts.LongCountAsync(x => x.NormalizedEmail == email && x.OccurredAtUtcTicks > ticks, ct);
-    }
-    public Task AddFailureAsync(string email, DateTimeOffset now, CancellationToken ct)
-    {
-        db.LoginAttempts.Add(new LoginAttempt { Id = Guid.NewGuid(), NormalizedEmail = email, OccurredAtUtcTicks = now.UtcTicks });
-        return Task.CompletedTask;
-    }
     public Task AddSessionAsync(SessionData session, CancellationToken ct)
     {
         db.Sessions.Add(new Session { TokenHash = session.TokenHash, UserId = session.UserId, ExpiresAtUtcTicks = session.ExpiresAtUtc.UtcTicks });

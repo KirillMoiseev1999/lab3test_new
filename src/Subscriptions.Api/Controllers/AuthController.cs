@@ -17,7 +17,6 @@ public sealed class AuthController(AuthService auth) : ApiControllerBase
 
     [HttpPost("login"), AllowAnonymous]
     [ProducesResponseType(typeof(LoginResponse), 200)]
-    [ProducesResponseType(typeof(ErrorResponse), 429)]
     public async Task<ActionResult<LoginResponse>> Login(AuthInput input, CancellationToken ct) =>
         Ok(await auth.LoginAsync(input, ct));
 

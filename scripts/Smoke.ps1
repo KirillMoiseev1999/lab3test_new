@@ -33,7 +33,7 @@ $null = Request POST '/auth/register' 201 $auth
 $null = Request POST '/auth/register' 409 $auth
 $login = Request POST '/auth/login' 200 $auth
 $token = $login.accessToken
-$input = @{name='Music';category='Media';price='100.00';currency='RUB';frequency='monthly';nextPaymentDate='2026-12-01';status='active'}
+$input = @{name='Music';price='100.00';frequency='monthly';nextPaymentDate='2026-12-01';status='active'}
 $sub = Request POST '/subscriptions' 201 $input $token
 $path = '/subscriptions/' + $sub.id
 $null = Request GET $path 200 $null $token
@@ -45,8 +45,9 @@ Check ($updated.price -eq '200.00') 'PUT replaces editable fields'
 $today=[DateTime]::UtcNow.Date
 $from=$today.ToString('yyyy-MM-dd'); $to=$today.AddDays(1).ToString('yyyy-MM-dd')
 $key=[guid]::NewGuid().ToString('N')
-$payment=@{amount='100.00';currency='RUB';paidOn=$from}
+$payment=@{amount='100.00';paidOn=$from}
 $one=Request POST "$path/payments" 201 $payment $token $key
+$payment.amount='100'
 $two=Request POST "$path/payments" 201 $payment $token $key
 Check ($one.id -eq $two.id) 'Replay returns the same payment ID'
 $payment.amount='101.00'
@@ -54,14 +55,26 @@ $null=Request POST "$path/payments" 409 $payment $token $key
 $history=Request GET "/payments?from=$from&to=$to&subscriptionId=$($sub.id)" 200 $null $token
 Check ($history.totalCount -eq 1) 'Payment is stored exactly once'
 $totals=Request GET "/analytics/expenses?from=$from&to=$to" 200 $null $token
-Check ($totals.byCurrency[0].amount -eq '100.00') 'Actual expenses are 100.00 RUB'
+Check ($totals.total -eq '100.00' -and $totals.bySubscription[0].amount -eq '100.00') 'Actual expenses are 100.00 RUB'
+$payment.amount='200.00'
+$null=Request POST "$path/payments" 201 $payment $token ([guid]::NewGuid().ToString('N'))
+$totals=Request GET "/analytics/expenses?from=$from&to=$to" 200 $null $token
+Check ($totals.total -eq '300.00' -and $totals.bySubscription[0].amount -eq '300.00') 'Two actual payments total 300.00 RUB'
 $auth.email="other-$email"
 $null=Request POST '/auth/register' 201 $auth
 $other=Request POST '/auth/login' 200 $auth
 $null=Request GET $path 404 $null $other.accessToken
+$null=Request PUT $path 404 $input $other.accessToken
 $null=Request POST "$path/payments" 404 $payment $other.accessToken ([guid]::NewGuid().ToString('N'))
 $input.price='0.00'
 $null=Request POST '/subscriptions' 400 $input $token
+$input.price='100.00'
+$input.currency='RUB'
+$null=Request POST '/subscriptions' 400 $input $token
+$input.Remove('currency')
+$input.category='Media'
+$null=Request POST '/subscriptions' 400 $input $token
+$input.Remove('category')
 $null=Request GET '/subscriptions?pageSize=101' 400 $null $token
 $null=Request DELETE $path 204 $null $token
 $null=Request DELETE $path 204 $null $token

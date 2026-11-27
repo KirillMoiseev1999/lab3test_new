@@ -7,5 +7,5 @@ public sealed class SubscriptionsDbContextFactory : IDesignTimeDbContextFactory<
 {
     public SubscriptionsDbContext CreateDbContext(string[] args) =>
         new(new DbContextOptionsBuilder<SubscriptionsDbContext>()
-            .UseSqlite("Data Source=subscriptions-v2.db;Foreign Keys=True;Default Timeout=30").Options);
+            .UseSqlite("Data Source=subscriptions-simple.db;Foreign Keys=True;Default Timeout=30").Options);
 }

@@ -14,7 +14,7 @@ using Subscriptions.DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
 var connection = builder.Configuration.GetConnectionString("Subscriptions") ??
-    $"Data Source={Path.Combine(builder.Environment.ContentRootPath, "subscriptions-v2.db")};Foreign Keys=True;Default Timeout=30";
+    $"Data Source={Path.Combine(builder.Environment.ContentRootPath, "subscriptions-simple.db")};Foreign Keys=True;Default Timeout=30";
 builder.Services.AddDataAccess(connection);
 builder.Services.AddSingleton<IClock, Subscriptions.Api.Infrastructure.SystemClock>();
 builder.Services.AddSingleton<IPasswordService, PasswordService>();
@@ -40,7 +40,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Subscriptions API", Version = "v1" });
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Subscriptions API", Version = "2.0.0", Description = "Учёт подписок и фактических расходов в рублях." });
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Type = SecuritySchemeType.Http,

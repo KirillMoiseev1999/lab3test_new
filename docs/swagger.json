@@ -1,0 +1,1432 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Subscriptions API",
+    "description": "Учёт подписок и фактических расходов в рублях.",
+    "version": "2.0.0"
+  },
+  "paths": {
+    "/api/v1/analytics/expenses": {
+      "get": {
+        "tags": [
+          "Analytics"
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "description": "Период [from,to), from < to.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "Период [from,to), from < to.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpensesResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthInput"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthInput"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthInput"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthInput"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/health/ready": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadyResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadyResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadyResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/subscriptions/{id}/payments": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Один ключ пользователя. Повтор в течение 24 часов: тот же ответ 201; другие реквизиты: 409.",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "minLength": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentInput"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentInput"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/payments": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "description": "Период [from,to), from < to.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "Период [from,to), from < to.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "subscriptionId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResponsePageResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/subscriptions": {
+      "post": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionInput"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionInput"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "active",
+                "paused",
+                "archived"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponsePageResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/subscriptions/{id}": {
+      "get": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionInput"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionInput"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AuthInput": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "maxLength": 254,
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "maxLength": 128,
+            "minLength": 12,
+            "type": "string",
+            "format": "password"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ErrorResponse": {
+        "required": [
+          "code",
+          "message",
+          "requestId"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "requestId": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExpensesResponse": {
+        "required": [
+          "bySubscription",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "pattern": "^[0-9]+\\.[0-9]{2}$",
+            "type": "string",
+            "description": "Сумма в рублях"
+          },
+          "bySubscription": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionExpense"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "LoginResponse": {
+        "required": [
+          "accessToken",
+          "expiresAt",
+          "tokenType"
+        ],
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "pattern": "^[0-9A-Fa-f]{64}$",
+            "type": "string"
+          },
+          "tokenType": {
+            "enum": [
+              "Bearer"
+            ],
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PaymentInput": {
+        "required": [
+          "amount",
+          "paidOn"
+        ],
+        "type": "object",
+        "properties": {
+          "amount": {
+            "pattern": "^(?!0+(?:\\.0{1,2})?$)[0-9]{1,9}(?:\\.[0-9]{1,2})?$",
+            "type": "string",
+            "description": "0.01–999999999.99 рубля"
+          },
+          "paidOn": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PaymentResponse": {
+        "required": [
+          "amount",
+          "id",
+          "paidOn",
+          "subscriptionId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "subscriptionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "pattern": "^[0-9]+\\.[0-9]{2}$",
+            "type": "string",
+            "description": "Сумма в рублях"
+          },
+          "paidOn": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PaymentResponsePageResponse": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentResponse"
+            }
+          },
+          "page": {
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReadyResponse": {
+        "required": [
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "enum": [
+              "ready"
+            ],
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubscriptionExpense": {
+        "required": [
+          "amount",
+          "name",
+          "subscriptionId"
+        ],
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "amount": {
+            "pattern": "^[0-9]+\\.[0-9]{2}$",
+            "type": "string",
+            "description": "Сумма в рублях"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubscriptionInput": {
+        "required": [
+          "frequency",
+          "name",
+          "nextPaymentDate",
+          "price",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "price": {
+            "pattern": "^(?!0+(?:\\.0{1,2})?$)[0-9]{1,9}(?:\\.[0-9]{1,2})?$",
+            "type": "string",
+            "description": "0.01–999999999.99 рубля"
+          },
+          "frequency": {
+            "enum": [
+              "monthly",
+              "yearly"
+            ],
+            "type": "string"
+          },
+          "nextPaymentDate": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "paused",
+              "archived"
+            ],
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubscriptionResponse": {
+        "required": [
+          "frequency",
+          "id",
+          "name",
+          "nextPaymentDate",
+          "price",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          },
+          "price": {
+            "pattern": "^[0-9]+\\.[0-9]{2}$",
+            "type": "string",
+            "description": "Сумма в рублях"
+          },
+          "frequency": {
+            "enum": [
+              "monthly",
+              "yearly"
+            ],
+            "type": "string"
+          },
+          "nextPaymentDate": {
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "paused",
+              "archived"
+            ],
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubscriptionResponsePageResponse": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionResponse"
+            }
+          },
+          "page": {
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserResponse": {
+        "required": [
+          "email",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "maxLength": 254,
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Токен из POST /api/v1/auth/login.",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

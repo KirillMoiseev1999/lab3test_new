@@ -11,7 +11,6 @@ public sealed class SqliteReadinessProbe(SubscriptionsDbContext db) : IReadiness
             return false;
         await db.Users.Take(1).CountAsync(ct);
         await db.Sessions.Take(1).CountAsync(ct);
-        await db.LoginAttempts.Take(1).CountAsync(ct);
         await db.Subscriptions.Take(1).CountAsync(ct);
         await db.Payments.Take(1).CountAsync(ct);
         await db.IdempotencyRecords.Take(1).CountAsync(ct);

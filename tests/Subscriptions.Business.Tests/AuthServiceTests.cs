@@ -30,11 +30,9 @@ public class AuthServiceTests : ServiceFixture
         Fails(async () => await AuthService.RegisterAsync(Credentials), 409);
         Auth.Verify(x => x.AddUserAsync(It.IsAny<UserData>(), It.IsAny<CancellationToken>()), Times.Never);
     }
-    [TestCase(0)]
-    [TestCase(4)]
-    public async Task LoginIssuesThirtyMinuteSession(int failures)
+    [Test]
+    public async Task LoginIssuesThirtyMinuteSession()
     {
-        Auth.Setup(x => x.CountFailuresAsync(It.IsAny<string>(), It.IsAny<DateTimeOffset>(), It.IsAny<CancellationToken>())).ReturnsAsync(failures);
         Auth.Setup(x => x.FindUserAsync("user@example.com", It.IsAny<CancellationToken>()))
             .ReturnsAsync(new UserData(User, "User@example.com", "user@example.com", "hash"));
         Passwords.Setup(x => x.Verify(User, "hash", Credentials.Password!)).Returns(true);
@@ -43,25 +41,16 @@ public class AuthServiceTests : ServiceFixture
         Assert.That(result.ExpiresAt, Is.EqualTo(Now.AddMinutes(30)));
         Assert.That(result.AccessToken.Length, Is.EqualTo(64));
         Auth.Verify(x => x.AddSessionAsync(new SessionData("hash", User, Now.AddMinutes(30)), It.IsAny<CancellationToken>()), Times.Once);
-        Auth.Verify(x => x.CountFailuresAsync("user@example.com", Now.AddMinutes(-15), It.IsAny<CancellationToken>()), Times.Once);
     }
     [TestCase(true)]
     [TestCase(false)]
-    public void BadCredentialsRecordFailureWithoutRevealingAccount(bool exists)
+    public void BadCredentialsDoNotRevealAccountOrCreateSession(bool exists)
     {
         if (exists) Auth.Setup(x => x.FindUserAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new UserData(User, "email", "email", "hash"));
         var ex = Fails(async () => await AuthService.LoginAsync(Credentials), 401);
         Assert.That(ex.Code, Is.EqualTo("invalid_session"));
-        Auth.Verify(x => x.AddFailureAsync("user@example.com", Now, It.IsAny<CancellationToken>()), Times.Once);
-    }
-    [TestCase(5)]
-    [TestCase(6)]
-    public void FiveFailuresBlockNextLogin(int count)
-    {
-        Auth.Setup(x => x.CountFailuresAsync(It.IsAny<string>(), It.IsAny<DateTimeOffset>(), It.IsAny<CancellationToken>())).ReturnsAsync(count);
-        Fails(async () => await AuthService.LoginAsync(Credentials), 429);
-        Auth.Verify(x => x.FindUserAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        Auth.Verify(x => x.AddSessionAsync(It.IsAny<SessionData>(), It.IsAny<CancellationToken>()), Times.Never);
     }
     [TestCase(null)]
     [TestCase("")]

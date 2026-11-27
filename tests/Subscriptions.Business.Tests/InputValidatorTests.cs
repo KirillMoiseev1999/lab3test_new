@@ -50,7 +50,7 @@ public class InputValidatorTests
     [TestCase(null)]
     [TestCase("other")]
     public void ChoiceRejectsUnknownValues(string? value) =>
-        Assert.Throws<BusinessException>(() => InputValidator.Choice(value, "currency", "RUB", "USD"));
+        Assert.Throws<BusinessException>(() => InputValidator.Choice(value, "status", "active", "paused"));
     [TestCase(null)]
     [TestCase("2026-02-29")]
     [TestCase("01.01.2026")]

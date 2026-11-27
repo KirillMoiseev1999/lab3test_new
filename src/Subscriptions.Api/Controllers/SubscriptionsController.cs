@@ -16,8 +16,8 @@ public sealed class SubscriptionsController(SubscriptionService service) : ApiCo
     [HttpGet]
     [ProducesResponseType(typeof(PageResponse<SubscriptionResponse>), 200)]
     public async Task<ActionResult<PageResponse<SubscriptionResponse>>> List(
-        string? status, string? category, string? page, string? pageSize, CancellationToken ct) =>
-        Ok(await service.ListAsync(UserId, status, category, page, pageSize, ct));
+        string? status, string? page, string? pageSize, CancellationToken ct) =>
+        Ok(await service.ListAsync(UserId, status, page, pageSize, ct));
 
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(SubscriptionResponse), 200)]
@@ -28,7 +28,6 @@ public sealed class SubscriptionsController(SubscriptionService service) : ApiCo
     [HttpPut("{id}")]
     [ProducesResponseType(typeof(SubscriptionResponse), 200)]
     [ProducesResponseType(typeof(ErrorResponse), 404)]
-    [ProducesResponseType(typeof(ErrorResponse), 409)]
     public async Task<ActionResult<SubscriptionResponse>> Update(Guid id, SubscriptionInput input, CancellationToken ct) =>
         Ok(await service.UpdateAsync(UserId, id, input, ct));
 

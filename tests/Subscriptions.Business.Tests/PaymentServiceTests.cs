@@ -34,7 +34,6 @@ public class PaymentServiceTests : ServiceFixture
     }
     [TestCase("subscription")]
     [TestCase("amount")]
-    [TestCase("currency")]
     [TestCase("date")]
     public void ChangedReplayDetailsConflict(string field)
     {
@@ -42,7 +41,6 @@ public class PaymentServiceTests : ServiceFixture
         {
             SubscriptionId = field == "subscription" ? Guid.NewGuid() : Id,
             Amount = field == "amount" ? 200m : 100m,
-            Currency = field == "currency" ? "USD" : "RUB",
             PaidOn = field == "date" ? new DateOnly(2026, 11, 26) : new DateOnly(2026, 11, 27)
         };
         Payments.Setup(x => x.FindKeyAsync(User, "key", It.IsAny<CancellationToken>()))
@@ -50,11 +48,28 @@ public class PaymentServiceTests : ServiceFixture
         Fails(async () => await PaymentService.CreateAsync(User, Id, "key", PaymentInput), 409);
     }
     [Test]
-    public void NewPaymentMustMatchSubscriptionCurrency() =>
-        Fails(async () => await PaymentService.CreateAsync(User, Id, "key", PaymentInput with { Currency = "USD" }), 400);
-    [Test]
     public void FuturePaymentIsRejected() =>
         Fails(async () => await PaymentService.CreateAsync(User, Id, "key", PaymentInput with { PaidOn = "2026-11-28" }), 400);
+    [TestCase("active")]
+    [TestCase("paused")]
+    [TestCase("archived")]
+    public async Task PaymentCanDifferFromPriceWithoutChangingSubscription(string status)
+    {
+        Subs.Setup(x => x.FindAsync(User, Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Data with { Status = status });
+        var result = await PaymentService.CreateAsync(User, Id, "key", PaymentInput with { Amount = "0.01" });
+        Assert.That(result.Amount, Is.EqualTo("0.01"));
+        Subs.Verify(x => x.UpdateAsync(It.IsAny<SubscriptionData>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+    [Test]
+    public async Task ReplayTreatsEquivalentDecimalStringsAsSameAmount()
+    {
+        Payments.Setup(x => x.FindKeyAsync(User, "key", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new IdempotencyData(Id, User, "key", Payment, Now));
+        var result = await PaymentService.CreateAsync(User, Id, " key ", PaymentInput with { Amount = "100" });
+        Assert.That(result.Id, Is.EqualTo(Payment.Id));
+        Payments.Verify(x => x.SaveAsync(It.IsAny<PaymentData>(), It.IsAny<IdempotencyData>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
     [Test]
     public void ForeignSubscriptionIsRejected()
     {
@@ -71,7 +86,6 @@ public class PaymentServiceTests : ServiceFixture
         var result = await PaymentService.ListAsync(User, subscription, "2026-11-01", "2026-12-01", null, null);
         Assert.That(result.TotalCount, Is.EqualTo(1));
         Assert.That(result.Items.Single().Id, Is.EqualTo(Id));
-        Assert.That(result.Items.Single().Currency, Is.EqualTo("RUB"));
     }
     [Test]
     public void MissingKeyIsRejected() =>
