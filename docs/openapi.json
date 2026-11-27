@@ -1,163 +1,24 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.0.3",
   "info": {
     "title": "Subscriptions API",
-    "version": "v1"
+    "version": "2.0.0",
+    "description": "Целевой контракт упрощённой учебной версии. Все суммы в рублях, без категорий и валют. Реализация обновляется отдельным этапом."
   },
+  "servers": [
+    {
+      "url": "https://localhost:7028/api/v1"
+    }
+  ],
   "paths": {
-    "/api/v1/analytics/expenses": {
-      "get": {
-        "tags": [
-          "Analytics"
-        ],
-        "parameters": [
-          {
-            "name": "from",
-            "in": "query",
-            "description": "Период [from,to), from < to.",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            }
-          },
-          {
-            "name": "to",
-            "in": "query",
-            "description": "Период [from,to), from < to.",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExpensesResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": [ ]
-          }
-        ]
-      }
-    },
-    "/api/v1/auth/register": {
+    "/auth/register": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AuthInput"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AuthInput"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/AuthInput"
-              }
-            }
-          }
-        },
+        "summary": "Регистрация",
+        "description": "",
+        "operationId": "post_auth_register",
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "201": {
-            "description": "Created",
+            "description": "Регистрация",
             "content": {
               "application/json": {
                 "schema": {
@@ -166,46 +27,8 @@
               }
             }
           },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/auth/login": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AuthInput"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AuthInput"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/AuthInput"
-              }
-            }
-          }
-        },
-        "responses": {
           "400": {
-            "description": "Bad Request",
+            "description": "Некорректные данные",
             "content": {
               "application/json": {
                 "schema": {
@@ -214,8 +37,8 @@
               }
             }
           },
-          "401": {
-            "description": "Unauthorized",
+          "409": {
+            "description": "Конфликт данных",
             "content": {
               "application/json": {
                 "schema": {
@@ -225,7 +48,7 @@
             }
           },
           "500": {
-            "description": "Internal Server Error",
+            "description": "Внутренняя ошибка",
             "content": {
               "application/json": {
                 "schema": {
@@ -235,7 +58,7 @@
             }
           },
           "503": {
-            "description": "Service Unavailable",
+            "description": "База не готова или недоступна",
             "content": {
               "application/json": {
                 "schema": {
@@ -243,9 +66,29 @@
                 }
               }
             }
-          },
+          }
+        },
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Вход",
+        "description": "Сессия 30 минут. Ограничение по числу ошибок не вводится.",
+        "operationId": "post_auth_login",
+        "responses": {
           "200": {
-            "description": "OK",
+            "description": "Вход",
             "content": {
               "application/json": {
                 "schema": {
@@ -254,27 +97,8 @@
               }
             }
           },
-          "429": {
-            "description": "Too Many Requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/auth/logout": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "responses": {
           "400": {
-            "description": "Bad Request",
+            "description": "Некорректные данные",
             "content": {
               "application/json": {
                 "schema": {
@@ -284,7 +108,350 @@
             }
           },
           "401": {
-            "description": "Unauthorized",
+            "description": "Нужны действующие учётные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Bearer"
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "База не готова или недоступна",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "Выход",
+        "description": "Отзывает только текущую сессию.",
+        "operationId": "post_auth_logout",
+        "responses": {
+          "204": {
+            "description": "Выход"
+          },
+          "401": {
+            "description": "Нужны действующие учётные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Bearer"
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "База не готова или недоступна",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/subscriptions": {
+      "post": {
+        "summary": "Создать подписку",
+        "description": "",
+        "operationId": "post_subscriptions",
+        "responses": {
+          "201": {
+            "description": "Создать подписку",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Нужны действующие учётные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Bearer"
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "База не готова или недоступна",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionInput"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Список собственных подписок",
+        "description": "Без фильтра все статусы. Сортировка nextPaymentDate,id по возрастанию.",
+        "operationId": "get_subscriptions",
+        "responses": {
+          "200": {
+            "description": "Список собственных подписок",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Нужны действующие учётные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Bearer"
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "База не готова или недоступна",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "paused",
+                "archived"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2147483647,
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "description": "",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ]
+      }
+    },
+    "/subscriptions/{id}": {
+      "get": {
+        "summary": "Получить подписку",
+        "description": "",
+        "operationId": "get_subscriptions_id",
+        "responses": {
+          "200": {
+            "description": "Получить подписку",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Нужны действующие учётные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Bearer"
+              }
+            }
+          },
+          "404": {
+            "description": "Подписка не найдена",
             "content": {
               "application/json": {
                 "schema": {
@@ -294,7 +461,7 @@
             }
           },
           "500": {
-            "description": "Internal Server Error",
+            "description": "Внутренняя ошибка",
             "content": {
               "application/json": {
                 "schema": {
@@ -304,7 +471,7 @@
             }
           },
           "503": {
-            "description": "Service Unavailable",
+            "description": "База не готова или недоступна",
             "content": {
               "application/json": {
                 "schema": {
@@ -312,99 +479,43 @@
                 }
               }
             }
-          },
-          "204": {
-            "description": "No Content"
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "Bearer": []
           }
-        ]
-      }
-    },
-    "/api/v1/health/ready": {
-      "get": {
-        "tags": [
-          "Health"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/subscriptions/{id}/payments": {
-      "post": {
-        "tags": [
-          "Payments"
         ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "description": "",
             "schema": {
               "type": "string",
               "format": "uuid"
             }
-          },
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "description": "Один ключ пользователя. Повтор в течение 24 часов: тот же ответ 201; другие реквизиты: 409.",
-            "required": true,
-            "schema": {
-              "maxLength": 128,
-              "minLength": 1,
-              "type": "string"
-            }
           }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PaymentInput"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PaymentInput"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/PaymentInput"
-              }
-            }
-          }
-        },
+        ]
+      },
+      "put": {
+        "summary": "Заменить поля подписки",
+        "description": "Может восстановить архивную подписку.",
+        "operationId": "put_subscriptions_id",
         "responses": {
+          "200": {
+            "description": "Заменить поля подписки",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponse"
+                }
+              }
+            }
+          },
           "400": {
-            "description": "Bad Request",
+            "description": "Некорректные данные",
             "content": {
               "application/json": {
                 "schema": {
@@ -414,7 +525,25 @@
             }
           },
           "401": {
-            "description": "Unauthorized",
+            "description": "Нужны действующие учётные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Bearer"
+              }
+            }
+          },
+          "404": {
+            "description": "Подписка не найдена",
             "content": {
               "application/json": {
                 "schema": {
@@ -424,7 +553,7 @@
             }
           },
           "500": {
-            "description": "Internal Server Error",
+            "description": "Внутренняя ошибка",
             "content": {
               "application/json": {
                 "schema": {
@@ -434,7 +563,54 @@
             }
           },
           "503": {
-            "description": "Service Unavailable",
+            "description": "База не готова или недоступна",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Архивировать подписку",
+        "description": "Повторная архивация также 204. История сохраняется.",
+        "operationId": "delete_subscriptions_id",
+        "responses": {
+          "204": {
+            "description": "Архивировать подписку"
+          },
+          "400": {
+            "description": "Некорректные данные",
             "content": {
               "application/json": {
                 "schema": {
@@ -443,8 +619,82 @@
               }
             }
           },
+          "401": {
+            "description": "Нужны действующие учётные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Bearer"
+              }
+            }
+          },
+          "404": {
+            "description": "Подписка не найдена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "База не готова или недоступна",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/subscriptions/{id}/payments": {
+      "post": {
+        "summary": "Записать фактический платёж",
+        "description": "Нет списания денег. Допускается архив. Ключ пользователя действует 24 часа; повтор тех же subscriptionId,amount,paidOn возвращает тот же платёж. Суммы 100 и 100.00 равнозначны. Изменение реквизитов — 409; ровно через 24 часа — новый платёж. Параллельные повторы атомарны.",
+        "operationId": "post_subscriptions_id_payments",
+        "responses": {
           "201": {
-            "description": "Created",
+            "description": "Записать фактический платёж",
             "content": {
               "application/json": {
                 "schema": {
@@ -453,8 +703,36 @@
               }
             }
           },
+          "400": {
+            "description": "Некорректные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Нужны действующие учётные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Bearer"
+              }
+            }
+          },
           "404": {
-            "description": "Not Found",
+            "description": "Подписка не найдена",
             "content": {
               "application/json": {
                 "schema": {
@@ -464,7 +742,27 @@
             }
           },
           "409": {
-            "description": "Conflict",
+            "description": "Конфликт данных",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "База не готова или недоступна",
             "content": {
               "application/json": {
                 "schema": {
@@ -476,22 +774,130 @@
         },
         "security": [
           {
-            "Bearer": [ ]
+            "Bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "description": "",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
           }
         ]
       }
     },
-    "/api/v1/payments": {
+    "/payments": {
       "get": {
-        "tags": [
-          "Payments"
+        "summary": "История фактических платежей",
+        "description": "Период [from,to), from < to. Сортировка paidOn по убыванию,id по возрастанию. Включает архивные подписки.",
+        "operationId": "get_payments",
+        "responses": {
+          "200": {
+            "description": "История фактических платежей",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Нужны действующие учётные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Bearer"
+              }
+            }
+          },
+          "404": {
+            "description": "Подписка не найдена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "База не готова или недоступна",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ],
         "parameters": [
           {
             "name": "from",
             "in": "query",
-            "description": "Период [from,to), from < to.",
             "required": true,
+            "description": "Включённая граница, from < to",
             "schema": {
               "type": "string",
               "format": "date"
@@ -500,8 +906,8 @@
           {
             "name": "to",
             "in": "query",
-            "description": "Период [from,to), from < to.",
             "required": true,
+            "description": "Исключённая граница",
             "schema": {
               "type": "string",
               "format": "date"
@@ -510,6 +916,8 @@
           {
             "name": "subscriptionId",
             "in": "query",
+            "required": false,
+            "description": "",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -518,119 +926,48 @@
           {
             "name": "page",
             "in": "query",
+            "required": false,
+            "description": "",
             "schema": {
-              "minimum": 1,
               "type": "integer",
+              "minimum": 1,
+              "maximum": 2147483647,
               "default": 1
             }
           },
           {
             "name": "pageSize",
             "in": "query",
+            "required": false,
+            "description": "",
             "schema": {
-              "maximum": 100,
-              "minimum": 1,
               "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
               "default": 20
             }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaymentResponsePageResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": [ ]
           }
         ]
       }
     },
-    "/api/v1/subscriptions": {
-      "post": {
-        "tags": [
-          "Subscriptions"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SubscriptionInput"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SubscriptionInput"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/SubscriptionInput"
+    "/analytics/expenses": {
+      "get": {
+        "summary": "Фактические расходы",
+        "description": "Включает архив. total и суммы по подпискам в рублях. Пустой результат: total=0.00,bySubscription=[]. Порядок по subscriptionId, названия текущие.",
+        "operationId": "get_analytics_expenses",
+        "responses": {
+          "200": {
+            "description": "Фактические расходы",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpensesResponse"
+                }
               }
             }
-          }
-        },
-        "responses": {
+          },
           "400": {
-            "description": "Bad Request",
+            "description": "Некорректные данные",
             "content": {
               "application/json": {
                 "schema": {
@@ -640,17 +977,25 @@
             }
           },
           "401": {
-            "description": "Unauthorized",
+            "description": "Нужны действующие учётные данные",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
+            },
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Bearer"
+              }
             }
           },
           "500": {
-            "description": "Internal Server Error",
+            "description": "Внутренняя ошибка",
             "content": {
               "application/json": {
                 "schema": {
@@ -660,7 +1005,7 @@
             }
           },
           "503": {
-            "description": "Service Unavailable",
+            "description": "База не готова или недоступна",
             "content": {
               "application/json": {
                 "schema": {
@@ -668,268 +1013,55 @@
                 }
               }
             }
-          },
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubscriptionResponse"
-                }
-              }
-            }
           }
         },
         "security": [
           {
-            "Bearer": [ ]
+            "Bearer": []
           }
-        ]
-      },
-      "get": {
-        "tags": [
-          "Subscriptions"
         ],
         "parameters": [
           {
-            "name": "status",
+            "name": "from",
             "in": "query",
+            "required": true,
+            "description": "Включённая граница, from < to",
             "schema": {
-              "enum": [
-                "active",
-                "paused",
-                "archived"
-              ],
-              "type": "string"
+              "type": "string",
+              "format": "date"
             }
           },
           {
-            "name": "category",
+            "name": "to",
             "in": "query",
+            "required": true,
+            "description": "Исключённая граница",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "date"
             }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "schema": {
-              "minimum": 1,
-              "type": "integer",
-              "default": 1
-            }
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "schema": {
-              "maximum": 100,
-              "minimum": 1,
-              "type": "integer",
-              "default": 20
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubscriptionResponsePageResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": [ ]
           }
         ]
       }
     },
-    "/api/v1/subscriptions/{id}": {
+    "/health/ready": {
       "get": {
-        "tags": [
-          "Subscriptions"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
+        "summary": "Готовность БД и схемы",
+        "description": "",
+        "operationId": "get_health_ready",
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "200": {
-            "description": "OK",
+            "description": "Готовность БД и схемы",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubscriptionResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": [ ]
-          }
-        ]
-      },
-      "put": {
-        "tags": [
-          "Subscriptions"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SubscriptionInput"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SubscriptionInput"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/SubscriptionInput"
-              }
-            }
-          }
-        },
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ReadyResponse"
                 }
               }
             }
           },
           "500": {
-            "description": "Internal Server Error",
+            "description": "Внутренняя ошибка",
             "content": {
               "application/json": {
                 "schema": {
@@ -939,37 +1071,7 @@
             }
           },
           "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubscriptionResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
+            "description": "База не готова или недоступна",
             "content": {
               "application/json": {
                 "schema": {
@@ -979,238 +1081,183 @@
             }
           }
         },
-        "security": [
-          {
-            "Bearer": [ ]
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "Subscriptions"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "204": {
-            "description": "No Content"
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": [ ]
-          }
-        ]
+        "security": []
       }
     }
   },
   "components": {
     "schemas": {
       "AuthInput": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 12,
+            "maxLength": 128
+          }
+        },
         "required": [
           "email",
           "password"
         ],
+        "additionalProperties": false
+      },
+      "UserResponse": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
           "email": {
-            "maxLength": 254,
             "type": "string",
             "format": "email"
-          },
-          "password": {
-            "maxLength": 128,
-            "minLength": 12,
-            "type": "string",
-            "format": "password"
           }
         },
-        "additionalProperties": false
-      },
-      "CategoryTotal": {
-        "type": "object",
-        "properties": {
-          "category": {
-            "type": "string",
-            "nullable": true
-          },
-          "currency": {
-            "type": "string",
-            "nullable": true
-          },
-          "amount": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "CurrencyTotal": {
-        "type": "object",
-        "properties": {
-          "currency": {
-            "type": "string",
-            "nullable": true
-          },
-          "amount": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "ErrorResponse": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string",
-            "nullable": true
-          },
-          "message": {
-            "type": "string",
-            "nullable": true
-          },
-          "requestId": {
-            "type": "string",
-            "nullable": true
-          },
-          "errors": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "ExpensesResponse": {
-        "type": "object",
-        "properties": {
-          "byCurrency": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CurrencyTotal"
-            },
-            "nullable": true
-          },
-          "byCategory": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CategoryTotal"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
+        "required": [
+          "id",
+          "email"
+        ]
       },
       "LoginResponse": {
         "type": "object",
         "properties": {
           "accessToken": {
             "type": "string",
-            "nullable": true
+            "pattern": "^[0-9A-Fa-f]{64}$"
           },
           "tokenType": {
             "type": "string",
-            "nullable": true
+            "enum": [
+              "Bearer"
+            ]
           },
           "expiresAt": {
             "type": "string",
             "format": "date-time"
           }
         },
+        "required": [
+          "accessToken",
+          "tokenType",
+          "expiresAt"
+        ]
+      },
+      "SubscriptionInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "price": {
+            "type": "string",
+            "pattern": "^(?!0+(?:\\.0{1,2})?$)[0-9]{1,9}(?:\\.[0-9]{1,2})?$",
+            "description": "0.01–999999999.99 рубля, не более двух дробных знаков",
+            "example": "100.00"
+          },
+          "frequency": {
+            "type": "string",
+            "enum": [
+              "monthly",
+              "yearly"
+            ]
+          },
+          "nextPaymentDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "paused",
+              "archived"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "price",
+          "frequency",
+          "nextPaymentDate",
+          "status"
+        ],
         "additionalProperties": false
       },
-      "PaymentInput": {
+      "SubscriptionResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "price": {
+            "type": "string",
+            "pattern": "^[0-9]+\\.[0-9]{2}$",
+            "description": "Сумма в рублях",
+            "example": "100.00"
+          },
+          "frequency": {
+            "type": "string",
+            "enum": [
+              "monthly",
+              "yearly"
+            ]
+          },
+          "nextPaymentDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "paused",
+              "archived"
+            ]
+          }
+        },
         "required": [
-          "amount",
-          "currency",
-          "paidOn"
-        ],
+          "id",
+          "name",
+          "price",
+          "frequency",
+          "nextPaymentDate",
+          "status"
+        ]
+      },
+      "PaymentInput": {
         "type": "object",
         "properties": {
           "amount": {
-            "pattern": "^[0-9]{1,9}(\\.[0-9]{1,2})?$",
             "type": "string",
-            "description": "0.01–999999999.99"
-          },
-          "currency": {
-            "enum": [
-              "RUB",
-              "USD",
-              "EUR"
-            ],
-            "type": "string"
+            "pattern": "^(?!0+(?:\\.0{1,2})?$)[0-9]{1,9}(?:\\.[0-9]{1,2})?$",
+            "description": "0.01–999999999.99 рубля, не более двух дробных знаков",
+            "example": "100.00"
           },
           "paidOn": {
-            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "description": "Не позже текущего дня UTC"
           }
         },
+        "required": [
+          "amount",
+          "paidOn"
+        ],
         "additionalProperties": false
       },
       "PaymentResponse": {
@@ -1226,185 +1273,174 @@
           },
           "amount": {
             "type": "string",
-            "nullable": true
-          },
-          "currency": {
-            "type": "string",
-            "nullable": true
+            "pattern": "^[0-9]+\\.[0-9]{2}$",
+            "description": "Сумма в рублях",
+            "example": "100.00"
           },
           "paidOn": {
             "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "PaymentResponsePageResponse": {
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PaymentResponse"
-            },
-            "nullable": true
-          },
-          "page": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "pageSize": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "totalCount": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
-      "SubscriptionInput": {
-        "required": [
-          "category",
-          "currency",
-          "frequency",
-          "name",
-          "nextPaymentDate",
-          "price",
-          "status"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "maxLength": 100,
-            "minLength": 1,
-            "type": "string"
-          },
-          "category": {
-            "maxLength": 50,
-            "minLength": 1,
-            "type": "string"
-          },
-          "price": {
-            "pattern": "^[0-9]{1,9}(\\.[0-9]{1,2})?$",
-            "type": "string",
-            "description": "0.01–999999999.99"
-          },
-          "currency": {
-            "enum": [
-              "RUB",
-              "USD",
-              "EUR"
-            ],
-            "type": "string"
-          },
-          "frequency": {
-            "enum": [
-              "monthly",
-              "yearly"
-            ],
-            "type": "string"
-          },
-          "nextPaymentDate": {
-            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-            "type": "string",
             "format": "date"
-          },
-          "status": {
-            "enum": [
-              "active",
-              "paused",
-              "archived"
-            ],
-            "type": "string"
           }
         },
-        "additionalProperties": false
+        "required": [
+          "id",
+          "subscriptionId",
+          "amount",
+          "paidOn"
+        ]
       },
-      "SubscriptionResponse": {
+      "SubscriptionExpense": {
         "type": "object",
         "properties": {
-          "id": {
+          "subscriptionId": {
             "type": "string",
             "format": "uuid"
           },
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
-          "category": {
+          "amount": {
             "type": "string",
-            "nullable": true
-          },
-          "price": {
-            "type": "string",
-            "nullable": true
-          },
-          "currency": {
-            "type": "string",
-            "nullable": true
-          },
-          "frequency": {
-            "type": "string",
-            "nullable": true
-          },
-          "nextPaymentDate": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "type": "string",
-            "nullable": true
+            "pattern": "^[0-9]+\\.[0-9]{2}$",
+            "description": "Сумма в рублях",
+            "example": "100.00"
           }
         },
-        "additionalProperties": false
+        "required": [
+          "subscriptionId",
+          "name",
+          "amount"
+        ]
       },
-      "SubscriptionResponsePageResponse": {
+      "ExpensesResponse": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "string",
+            "pattern": "^[0-9]+\\.[0-9]{2}$",
+            "description": "Сумма в рублях",
+            "example": "100.00"
+          },
+          "bySubscription": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionExpense"
+            }
+          }
+        },
+        "required": [
+          "total",
+          "bySubscription"
+        ]
+      },
+      "ReadyResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "requestId": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "requestId"
+        ]
+      },
+      "SubscriptionPage": {
         "type": "object",
         "properties": {
           "items": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SubscriptionResponse"
-            },
-            "nullable": true
+            }
           },
           "page": {
             "type": "integer",
-            "format": "int32"
+            "minimum": 1
           },
           "pageSize": {
             "type": "integer",
-            "format": "int32"
+            "minimum": 1,
+            "maximum": 100
           },
           "totalCount": {
             "type": "integer",
-            "format": "int32"
+            "minimum": 0
           }
         },
-        "additionalProperties": false
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount"
+        ]
       },
-      "UserResponse": {
+      "PaymentPage": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentResponse"
+            }
           },
-          "email": {
-            "type": "string",
-            "nullable": true
+          "page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "pageSize": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "totalCount": {
+            "type": "integer",
+            "minimum": 0
           }
         },
-        "additionalProperties": false
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount"
+        ]
       }
     },
     "securitySchemes": {
       "Bearer": {
         "type": "http",
-        "description": "Токен из POST /api/v1/auth/login.",
-        "scheme": "bearer"
+        "scheme": "bearer",
+        "description": "Токен из auth/login, срок 30 минут"
       }
     }
   }
